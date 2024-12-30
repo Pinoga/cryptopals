@@ -29,21 +29,17 @@ fn base_64_encode(input: &[u8]) -> Vec<u8> {
 
     let mut output_index: usize = 0;
     let mut index: usize = 0;
-    while output_index < size {
-        // println!("bit_count: {:<16}", bit_count);
+    while index < input.len() {
+        println!("bit_accumulator:         {:016b}", bit_accumulator);
+        bit_accumulator <<= 8;
 
-        if index < input.len() {
-            println!("bit_accumulator:         {:016b}", bit_accumulator);
-            bit_accumulator <<= 8;
+        println!("bit_accumulator <<=8:    {:016b}", bit_accumulator);
+        bit_accumulator |= input[index] as u16;
+        println!("read byte:               {:016b}", input[index]);
+        println!("bit_accumulator |= byte: {:016b}", bit_accumulator);
 
-            println!("bit_accumulator <<=8:    {:016b}", bit_accumulator);
-            bit_accumulator |= input[index] as u16;
-            println!("read byte:               {:016b}", input[index]);
-            println!("bit_accumulator |= byte: {:016b}", bit_accumulator);
-
-            bit_count += 8;
-            index += 1
-        }
+        bit_count += 8;
+        index += 1;
 
         while bit_count >= 6 {
             output[output_index] =
@@ -60,22 +56,24 @@ fn base_64_encode(input: &[u8]) -> Vec<u8> {
                 bit_count, bit_accumulator
             );
         }
-
-        if bit_count > 0 {
-            output[output_index] =
-                BASE_64_CHARACTERS[(bit_accumulator << (6 - bit_count)) as usize];
-            output_index += 1;
-            println!(
-                "base64 6-bit ({} padded zeroes):       {:06b}",
-                6 - bit_count,
-                (bit_accumulator << (6 - bit_count))
-            );
-            bit_count = 0;
-            bit_accumulator = 0;
-        } else if output_index < output.len() {
-            output[output_index] = b'=';
-            output_index += 1;
-        }
     }
-    output
+
+    // If there's remaining bits in the accumulator, pad them with zeroes until we have 6 bits
+    if bit_count > 0 {
+        output[output_index] = BASE_64_CHARACTERS[(bit_accumulator << (6 - bit_count)) as usize];
+        output_index += 1;
+        println!(
+            "base64 6-bit ({} padded zeroes):       {:06b}",
+            6 - bit_count,
+            (bit_accumulator << (6 - bit_count))
+        );
+    }
+
+    // Insert padding
+    while output_index < output.len() {
+        output[output_index] = b'=';
+        output_index += 1;
+    }
+
+    return output;
 }
