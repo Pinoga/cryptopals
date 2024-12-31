@@ -1,4 +1,4 @@
-use std::{cmp, env};
+use std::env;
 
 static BASE_64_CHARACTERS: &[u8; 64] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -23,39 +23,23 @@ fn base_64_encode(input: &[u8]) -> Vec<u8> {
 
     let mut output = vec![0u8; size];
 
-    let mut bit_accumulator: u32 = 0;
+    let mut bit_accumulator: u16 = 0;
 
     let mut bit_count: u32 = 0;
 
     let mut output_index: usize = 0;
     let mut index: usize = 0;
     while index < input.len() {
-        let mut shift = cmp::min(3, input.len() - index) * 8;
-        println!("bit_accumulator:               {:032b}", bit_accumulator);
-        bit_accumulator <<= shift;
+        println!("bit_accumulator:         {:016b}", bit_accumulator);
+        bit_accumulator <<= 8;
 
-        println!("bit_accumulator <<=24:         {:032b}", bit_accumulator);
-        bit_accumulator |= (input[index] as u32) << shift - 8;
-        println!("read first byte:               {:032b}", input[index]);
-        println!("bit_accumulator |= byte:       {:032b}", bit_accumulator);
-        index += 1;
+        println!("bit_accumulator <<=8:    {:016b}", bit_accumulator);
+        bit_accumulator |= input[index] as u16;
+        println!("read byte:               {:016b}", input[index]);
+        println!("bit_accumulator |= byte: {:016b}", bit_accumulator);
+
         bit_count += 8;
-
-        if index < input.len() {
-            bit_accumulator |= (input[index] as u32) << shift - 16;
-            println!("read second byte:              {:032b}", input[index]);
-            println!("bit_accumulator |= byte:       {:032b}", bit_accumulator);
-            index += 1;
-            bit_count += 8;
-        }
-
-        if index < input.len() {
-            bit_accumulator |= input[index] as u32;
-            println!("read third byte:               {:032b}", input[index]);
-            println!("bit_accumulator |= byte:       {:032b}", bit_accumulator);
-            index += 1;
-            bit_count += 8;
-        }
+        index += 1;
 
         while bit_count >= 6 {
             output[output_index] =
@@ -68,7 +52,7 @@ fn base_64_encode(input: &[u8]) -> Vec<u8> {
             bit_count -= 6;
             bit_accumulator &= (1 << bit_count) - 1;
             println!(
-                "keep last {:02} bits:             {:032b}",
+                "keep last {} bits:        {:016b}",
                 bit_count, bit_accumulator
             );
         }
