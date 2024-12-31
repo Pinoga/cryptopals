@@ -40,17 +40,11 @@ fn main() {
 }
 
 fn hex_char_to_byte(char: u8) -> Result<u8, InvalidHexCharError> {
-    // It's a digit
-    if char >= 48 && char <= 57 {
-        return Ok(char - 48);
-    // It's a-f
-    } else if char >= 65 && char <= 70 {
-        return Ok(char - 55);
-    // It's A-F
-    } else if char >= 97 && char <= 102 {
-        return Ok(char - 87);
-    } else {
-        return Err(InvalidHexCharError);
+    match char {
+        b'0'..=b'9' => Ok(char - b'0'),
+        b'a'..=b'z' => Ok(char - b'a' + 10),
+        b'A'..=b'Z' => Ok(char - b'A' + 10),
+        _ => Err(InvalidHexCharError),
     }
 }
 
