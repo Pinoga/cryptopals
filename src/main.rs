@@ -7,6 +7,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let input = args[1].as_bytes();
+    // let input = b"ab";
     for letter in input {
         println!("letter (input): {:08b}", *letter)
     }
@@ -21,58 +22,57 @@ fn main() {
 fn base_64_encode(input: &[u8]) -> Vec<u8> {
     let size: usize = (input.len().div_ceil(3) * 4) as usize;
 
-    let mut output = vec![0u8; size];
+    let mut output = Vec::with_capacity(size);
 
-    let mut bit_accumulator: u16 = 0;
-
-    let mut bit_count: u32 = 0;
-
-    let mut output_index: usize = 0;
     let mut index: usize = 0;
-    while index < input.len() {
-        println!("bit_accumulator:         {:016b}", bit_accumulator);
-        bit_accumulator <<= 8;
 
-        println!("bit_accumulator <<=8:    {:016b}", bit_accumulator);
-        bit_accumulator |= input[index] as u16;
-        println!("read byte:               {:016b}", input[index]);
-        println!("bit_accumulator |= byte: {:016b}", bit_accumulator);
+    // We have at least 3 bytes to read
+    while index + 2 < input.len() {
+        // load 3 bytes into chunk
+        let chunk = ((input[index] as u32) << 16)
+            | ((input[index + 1] as u32) << 8)
+            | (input[index + 2] as u32);
 
-        bit_count += 8;
-        index += 1;
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 18) & 0x3F) as usize]);
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 12) & 0x3F) as usize]);
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 6) & 0x3F) as usize]);
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[(chunk & 0x3F) as usize]);
 
-        while bit_count >= 6 {
-            output[output_index] =
-                BASE_64_CHARACTERS[(bit_accumulator >> (bit_count - 6)) as usize];
-            output_index += 1;
-            println!(
-                "base64 6-bit:       {:06b}",
-                (bit_accumulator >> (bit_count - 6))
-            );
-            bit_count -= 6;
-            bit_accumulator &= (1 << bit_count) - 1;
-            println!(
-                "keep last {} bits:        {:016b}",
-                bit_count, bit_accumulator
-            );
-        }
+        index += 3;
     }
 
-    // If there's remaining bits in the accumulator, pad them with zeroes until we have 6 bits
-    if bit_count > 0 {
-        output[output_index] = BASE_64_CHARACTERS[(bit_accumulator << (6 - bit_count)) as usize];
-        output_index += 1;
-        println!(
-            "base64 6-bit ({} padded zeroes):       {:06b}",
-            6 - bit_count,
-            (bit_accumulator << (6 - bit_count))
-        );
-    }
+    let remaining_bytes = input.len() - index;
 
-    // Insert padding
-    while output_index < output.len() {
-        output[output_index] = b'=';
-        output_index += 1;
+    if remaining_bytes == 1 {
+        let chunk = (input[index] as u32) << 16;
+
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 18) & 0x3F) as usize]);
+
+        // read 6 bits (with 4-bit padding)
+        output.push(BASE_64_CHARACTERS[((chunk >> 12) & 0x3F) as usize]);
+
+        // since we've formed only two letters, pad the output with two ='s
+        output.push(b'=');
+        output.push(b'=');
+    } else if remaining_bytes == 2 {
+        let chunk = ((input[index] as u32) << 16) | ((input[index + 1] as u32) << 8);
+
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 18) & 0x3F) as usize]);
+
+        // read 6 bits
+        output.push(BASE_64_CHARACTERS[((chunk >> 12) & 0x3F) as usize]);
+
+        // read 6 bits (with 2-bit padding)
+        output.push(BASE_64_CHARACTERS[((chunk >> 6) & 0x3F) as usize]);
+
+        // since we've formed only three letters, pad the output with a =
+        output.push(b'=');
     }
 
     return output;
