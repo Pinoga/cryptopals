@@ -53,21 +53,19 @@ fn hex_to_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
 
     let mut output = Vec::with_capacity(size);
 
-    let mut index = 0;
+    let mut iter = input.iter();
 
     // Since two hexes form a byte, if we have an odd amount of hexes we must treat the first hex as a full byte
     if input.len() % 2 == 1 {
-        let first_hex_digit = hex_char_to_byte(input[index])?;
+        let first_hex_digit = hex_char_to_byte(*iter.next().unwrap())?;
         output.push(first_hex_digit);
-        index += 1;
     }
 
     // reading two hex characters at a time
-    while index + 1 < input.len() {
-        let first_hex_digit = hex_char_to_byte(input[index])?;
-        let second_hex_digit = hex_char_to_byte(input[index + 1])?;
+    while let (Some(&high), Some(&low)) = (iter.next(), iter.next()) {
+        let first_hex_digit = hex_char_to_byte(high)?;
+        let second_hex_digit = hex_char_to_byte(low)?;
         output.push((first_hex_digit << 4) | (second_hex_digit));
-        index += 2;
     }
 
     return Ok(output);
