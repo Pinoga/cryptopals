@@ -1,22 +1,82 @@
-use std::env;
+use std::{env, fmt::Display, fmt::Formatter};
 
 static BASE_64_CHARACTERS: &[u8; 64] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+#[derive(Debug, Clone)]
+struct InvalidHexCharError;
+
+impl std::error::Error for InvalidHexCharError {}
+
+impl Display for InvalidHexCharError {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "invalid hex character")
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let input = args[1].as_bytes();
-    // let input = b"ab";
-    for letter in input {
-        println!("letter (input): {:08b}", *letter)
-    }
+    let hex = args[1].as_bytes();
 
-    let output = base_64_encode(input);
+    let hex_bytes = hex_to_bytes(hex).expect("cannot parse hex string");
+
+    for byte in &hex_bytes {
+        print!("{:08b}", *byte);
+    }
+    println!();
+
+    // let input = args[1].as_bytes();
+    // let input = b"ab";
+    // for letter in input {
+    //     println!("letter (input): {:08b}", *letter)
+    // }
+
+    let output = base_64_encode(&hex_bytes);
 
     for letter in &output {
         print!("{}", *letter as char);
     }
+}
+
+fn hex_char_to_byte(char: u8) -> Result<u8, InvalidHexCharError> {
+    // It's a digit
+    if char >= 48 && char <= 57 {
+        return Ok(char - 48);
+    // It's a-f
+    } else if char >= 65 && char <= 70 {
+        return Ok(char - 55);
+    // It's A-F
+    } else if char >= 97 && char <= 102 {
+        return Ok(char - 87);
+    } else {
+        return Err(InvalidHexCharError);
+    }
+}
+
+fn hex_to_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
+    let size = input.len().div_ceil(2);
+
+    let mut output = Vec::with_capacity(size);
+
+    let mut index = 0;
+
+    // Since two hexes form a byte, if we have an odd amount of hexes we must treat the first hex as a full byte
+    if input.len() % 2 == 1 {
+        let first_hex_digit = hex_char_to_byte(input[index])?;
+        output.push(first_hex_digit);
+        index += 1;
+    }
+
+    // reading two hex characters at a time
+    while index + 1 < input.len() {
+        let first_hex_digit = hex_char_to_byte(input[index])?;
+        let second_hex_digit = hex_char_to_byte(input[index + 1])?;
+        output.push((first_hex_digit << 4) | (second_hex_digit));
+        index += 2;
+    }
+
+    return Ok(output);
 }
 
 fn base_64_encode(input: &[u8]) -> Vec<u8> {
