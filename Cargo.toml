@@ -3,4 +3,8 @@ name = "cryptopals"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "hex_to_base_64"
+
+
 [dependencies]
