@@ -42,3 +42,47 @@ pub fn hex_decode_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
 
     return Ok(output);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_input() {
+        let empty_input = [];
+        let result = hex_decode_bytes(&empty_input).expect("fail to parse hex string");
+        assert_eq!(result.len(), 0);
+    }
+
+    #[test]
+    fn one_character() {
+        let empty_input = [b'a'];
+        let result = hex_decode_bytes(&empty_input).expect("fail to parse hex string");
+        assert_eq!(result.len(), 1);
+        assert_eq!(result, [0xA]);
+    }
+
+    #[test]
+    fn two_characters() {
+        let empty_input = [b'a', b'3'];
+        let result = hex_decode_bytes(&empty_input).expect("fail to parse hex string");
+        assert_eq!(result.len(), 1);
+        assert_eq!(result, [0xA3]);
+    }
+
+    #[test]
+    fn three_characters() {
+        let empty_input = [b'a', b'3', b'f'];
+        let result = hex_decode_bytes(&empty_input).expect("fail to parse hex string");
+        assert_eq!(result.len(), 2);
+        assert_eq!(result, [0xA, 0x3F]);
+    }
+
+    #[test]
+    fn long_input() {
+        let empty_input = [b'0', b'0', b'0', b'f', b'1', b'2', b'0', b'0', b'c', b'e'];
+        let result = hex_decode_bytes(&empty_input).expect("fail to parse hex string");
+        assert_eq!(result.len(), 5);
+        assert_eq!(result, [0x0, 0x0F, 0x12, 0x0, 0xCE]);
+    }
+}
