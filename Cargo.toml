@@ -6,5 +6,7 @@ edition = "2021"
 [[bin]]
 name = "hex_to_base_64"
 
+[[bin]]
+name = "fixed_xor"
 
 [dependencies]

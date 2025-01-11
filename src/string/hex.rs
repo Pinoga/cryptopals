@@ -11,6 +11,8 @@ impl Display for InvalidHexCharError {
     }
 }
 
+static HEX_CHARS: &[u8; 16] = b"0123456789abcdef";
+
 fn hex_char_to_byte(char: u8) -> Result<u8, InvalidHexCharError> {
     match char {
         b'0'..=b'9' => Ok(char - b'0'),
@@ -18,6 +20,13 @@ fn hex_char_to_byte(char: u8) -> Result<u8, InvalidHexCharError> {
         b'A'..=b'F' => Ok(char - b'A' + 10),
         _ => Err(InvalidHexCharError),
     }
+}
+
+fn byte_to_hex_chars(byte: u8) -> [u8; 2] {
+    return [
+        HEX_CHARS[(byte >> 4) as usize],
+        HEX_CHARS[(byte & 0xF) as usize],
+    ];
 }
 
 pub fn hex_decode_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
@@ -41,6 +50,20 @@ pub fn hex_decode_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
     }
 
     return Ok(output);
+}
+
+pub fn hex_encode(input: &[u8]) -> String {
+    let mut output = Vec::with_capacity(input.len() * 2);
+
+    let mut iter = input.iter();
+
+    while let Some(&byte) = iter.next() {
+        output.push(HEX_CHARS[(byte >> 4) as usize]);
+        output.push(HEX_CHARS[(byte & 0xF) as usize]);
+    }
+
+    // This is safe because we know output is ASCII
+    return unsafe { String::from_utf8_unchecked(output) };
 }
 
 #[cfg(test)]
