@@ -1,5 +1,5 @@
-fn character_frequencies_scores_english() -> [u8; 128] {
-    let mut table = [0u8; 128];
+fn character_frequencies_scores_english() -> [u8; 256] {
+    let mut table = [0u8; 256];
 
     // Populate the array with scores
     table[' ' as usize] = 27; // Space
@@ -34,7 +34,7 @@ fn character_frequencies_scores_english() -> [u8; 128] {
 }
 
 pub fn english_score(text: &[u8]) -> u32 {
-    let scores: [u8; 128] = character_frequencies_scores_english();
+    let scores: [u8; 256] = character_frequencies_scores_english();
     let mut score: u32 = 0;
     for char in text {
         score += scores[*char as usize] as u32;

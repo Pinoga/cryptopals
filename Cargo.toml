@@ -12,4 +12,7 @@ name = "fixed_xor"
 [[bin]]
 name = "single_byte_xor"
 
+[[bin]]
+name = "single_character_xor"
+
 [dependencies]
