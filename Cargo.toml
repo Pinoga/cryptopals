@@ -9,4 +9,7 @@ name = "hex_to_base_64"
 [[bin]]
 name = "fixed_xor"
 
+[[bin]]
+name = "single_byte_xor"
+
 [dependencies]

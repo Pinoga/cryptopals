@@ -22,13 +22,6 @@ fn hex_char_to_byte(char: u8) -> Result<u8, InvalidHexCharError> {
     }
 }
 
-fn byte_to_hex_chars(byte: u8) -> [u8; 2] {
-    return [
-        HEX_CHARS[(byte >> 4) as usize],
-        HEX_CHARS[(byte & 0xF) as usize],
-    ];
-}
-
 pub fn hex_decode_bytes(input: &[u8]) -> Result<Vec<u8>, InvalidHexCharError> {
     let size = input.len().div_ceil(2);
 
