@@ -1,6 +1,6 @@
 use std::{env, fs};
 
-use cryptopals::string::{hex::hex_encode, xor::repeating_key_xor};
+use cryptopals::crypto::{hex::hex_encode, xor::repeating_key_xor};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

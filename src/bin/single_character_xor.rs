@@ -1,6 +1,6 @@
 use std::fs;
 
-use cryptopals::string::{hex::hex_decode_bytes, xor::best_guess_decrypt_single_xor};
+use cryptopals::crypto::{hex::hex_decode_bytes, xor::best_guess_decrypt_single_xor};
 
 fn main() {
     let file = fs::read("./data/single_character_xor.txt").expect("Error reading file");

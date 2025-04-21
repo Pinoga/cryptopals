@@ -71,7 +71,7 @@ pub fn best_guess_decrypt_single_xor(cipher_bytes: &[u8]) -> (Vec<u8>, Vec<u8>, 
 mod test {
     use std::fs;
 
-    use crate::string::hex::hex_encode;
+    use crate::crypto::hex::hex_encode;
 
     use super::*;
 

@@ -1,6 +1,6 @@
 use std::env;
 
-use cryptopals::string::{base64::base_64_encode_bytes, hex::hex_decode_bytes};
+use cryptopals::crypto::{base64::base_64_encode_bytes, hex::hex_decode_bytes};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

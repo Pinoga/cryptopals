@@ -1,6 +1,6 @@
 use std::{env, error::Error};
 
-use cryptopals::string::{
+use cryptopals::crypto::{
     hex::{hex_decode_bytes, hex_encode, InvalidHexCharError},
     xor::{xor, XORDistinctLengthInputsError},
 };

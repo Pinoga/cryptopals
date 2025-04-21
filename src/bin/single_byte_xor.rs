@@ -1,4 +1,4 @@
-use cryptopals::string::{hex::hex_decode_bytes, xor::best_guess_decrypt_single_xor};
+use cryptopals::crypto::{hex::hex_decode_bytes, xor::best_guess_decrypt_single_xor};
 
 fn main() {
     let cipher_hex = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
