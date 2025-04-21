@@ -15,4 +15,7 @@ name = "single_byte_xor"
 [[bin]]
 name = "single_character_xor"
 
+[[bin]]
+name = "repeating_key_xor"
+
 [dependencies]
